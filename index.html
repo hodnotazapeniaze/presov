@@ -1,0 +1,249 @@
+<!doctype html>
+
+<html lang="sk">
+<head>
+  <meta charset="utf-8">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js">  </script>
+  <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js">  </script>
+  <title>Postav si vlastný obchvat</title>
+
+  <style type="text/css">
+  		body {
+  			font: 11pt 'Arial Narrow', sans-serif;
+  		}
+
+  		.container {
+  			width: 500px; height: 500px;
+  			padding: 0.5em; float: left; margin: 10px; 
+  			background: center url('presov.png');
+  		}
+
+  		.cena {
+  			background: white;
+  			display: block;
+  			padding: 0.5em;
+  			margin: 5px 0;
+  			width: 130px;
+  		}
+
+  		.uspora {
+  			background: #ccc;
+  			font-size: 10pt;
+  		}
+  		#reset {
+  			font-size: 8pt;
+  			width: 10px;
+  			color: white;
+  			font-weight: bold;
+  			cursor: pointer;
+  			background: red;
+  		}
+  		.positive {
+  			color: #05ae1e;
+  		}
+  		.negative {
+  			color: red;
+  		}
+  		.dragdrop { 
+  			width: 100px; height: 100px; padding: 0.5em; float: left; margin: 10px; 
+  			background: #eee;
+  			cursor: pointer;
+  		}
+
+  		.dragdrop p {
+  			margin: 0;
+  		}
+
+  		.dragdrop strong {
+  			display: block;
+  		}
+
+  		.sever {
+  			background: rgb(0,176,240);
+  			color: white;
+  		}
+
+  		.vychod {
+  			background: rgb(0,112,192);
+  			color: white;
+  		}
+  		.juh {
+  			background: rgb(0,32,96);
+  			color: white;
+  		}
+
+  </style>
+
+
+</head>
+
+<body>
+  <script>
+
+  	function reset_storage() {
+  		localStorage.sever = "";
+  		localStorage.juh = "";
+  		localStorage.vychod = "";
+  		localStorage.mesto = "";
+  		localStorage.cena = 0;
+  		$("#cena").text(localStorage.cena);
+		$("#uspora").text(0);
+
+ 		$(".dragdrop").each(function(){ 
+ 			$(this).css({
+	 			 'left': $(this).data('originalLeft'),
+	        	'top': $(this).data('origionalTop')
+       		});
+       	});
+  		return true;
+  	}
+
+  	function daj_smer(e) {
+  		if(e.hasClass("sever")) {
+  			return "sever";
+  		} else {
+  			if(e.hasClass("juh")) {
+  			return "juh";
+	  		} else {
+	  			if(e.hasClass("vychod")) {
+		  			return "vychod";
+		  		} else {
+		  			return "mesto";
+		  		}
+	  		}
+  		}
+  	}
+
+  	function mozem_pridat(e) {
+  		var smer = daj_smer($(e));
+  		console.log(smer);
+  		if (localStorage.getItem(smer) == "") {
+  			return true;
+  		} else {
+  			return false;
+  		}
+  	}
+
+  	$(document).ready(function() {
+  		$(".dragdrop").each(function(){ 
+  			$(this).data({
+			    'originalLeft': $(this).css('left'),
+			    'origionalTop': $(this).css('top')
+			});
+		});
+  		reset_storage();
+  		$("#reset").click(reset_storage);
+	    $(".dragdrop").draggable({ 
+	    	revert: 'invalid',
+	    	snap: ".container",
+	    	grid: [25,25] });
+	    $(".container").droppable({
+	    	accept: mozem_pridat,
+	    	classes: {
+		        "ui-droppable-active": "ui-state-active",
+		        "ui-droppable-hover": "ui-state-hover"
+		      },
+		    drop: function (event, ui) {
+		    	var e = ui.draggable;
+		    	e.addClass("dropped");
+
+		    	var p = parseInt(e.attr("data-price"));
+		    	var smer = daj_smer($(e));
+		    	localStorage.setItem(smer, e.find("strong").text());
+		    	var c = parseInt(localStorage.cena) + p
+		    	localStorage.cena = c;
+		    	$("#cena").text(localStorage.cena);
+		    	var u = 891 - c;
+		    	$("#uspora").text(u);
+
+		    	if (u < 0) {
+		    		$("#uspora").addClass("negative").removeClass("positive");
+		    	} else {
+		    		$("#uspora").removeClass("negative").addClass("positive");
+		    	}
+		    	$(".dragdrop.dropped").click(reset_storage);
+		    }
+	    });
+	});
+  </script>
+
+  <h1>Postav si vlastný obchvat Prešova</h1>
+
+  <div class="ui-widget-content container">
+  	<strong class="cena">Cena: <span id="cena">0</span> mil. eur</strong> 
+  	<strong class="cena uspora">Úspora: <span id="uspora">0</span> mil. eur</strong>
+  	<strong class="cena" id="reset">X</strong> 
+  </div>
+
+  <div class="ui-widget-content dragdrop sever" data-price="535">
+  	<p>
+  		<strong>R4 Severný obchvat</strong>
+  			
+  	</p>
+  </div>
+
+  <div class="ui-widget-content dragdrop sever" data-price="433">
+  	<p>
+  		<strong>R4 Severný obchvat (modifikovaný)</strong>
+  			
+  	</p>
+  </div>
+
+  <div class="ui-widget-content dragdrop sever" data-price="376">
+  	<p>
+  		<strong>R4 Severný obchvat</strong>
+  		<em>Polovičný profil</em>
+  			
+  	</p>
+  </div>
+
+  <div class="ui-widget-content dragdrop sever" data-price="314">
+  	<p>
+  		<strong>R4 Severný obchvat (modifikovaný)</strong>
+  		<em>Polovičný profil</em>
+  			
+  	</p>
+  </div>
+
+  <div class="ui-widget-content dragdrop vychod" data-price="280">
+  	<p>
+  		<strong>R4 Východný obchvat</strong>
+  			
+  	</p>
+  </div>
+
+  <div class="ui-widget-content dragdrop vychod" data-price="199">
+  	<p>
+  		<strong>R4 Východný obchvat</strong>
+  		<em>Polovičný profil</em>
+  			
+  	</p>
+  </div>
+
+  <div class="ui-widget-content dragdrop juh" data-price="356">
+  	<p>
+  		<strong>D1 Južný obchvat</strong>
+  			
+  	</p>
+  </div>
+
+  <div class="ui-widget-content dragdrop juh" data-price="233">
+  	<p>
+  		<strong>D1 Južný obchvat</strong>
+  		<em>Polovičný profil</em>
+  			
+  	</p>
+  </div>
+
+  <div class="ui-widget-content dragdrop i68" data-price="136">
+  	<p>
+  		<strong>Preložka cesty I/68</strong>
+  			
+  	</p>
+  </div>
+
+
+
+
+</body>
+</html>
